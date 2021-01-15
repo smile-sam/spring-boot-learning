@@ -1,0 +1,159 @@
+<!--<?xml  version = "1.0"  encoding = "UTF-8" ?>-->
+<!--<configuration>-->
+<!--    <property name="LOG_HOME" value="${user.home}/logs"/>-->
+<!--    &lt;!&ndash;日志文件名称：这里spring.application.name表示工程名称&ndash;&gt;-->
+<!--    <springProperty scope="context" name="APP_NAME" source="spring.application.name"/>-->
+
+<!--    &lt;!&ndash;-->
+<!--       说明：-->
+<!--       1、日志级别及文件-->
+<!--           日志记录采用分级记录，级别与日志文件名相对应，不同级别的日志信息记录到不同的日志文件中-->
+<!--           例如：error级别记录到{log.context.name}_error.log（该文件为当前记录的日志文件），而{log.context.name}__error.log为归档日志，-->
+<!--           日志文件按日期记录，每天的日志不再拆分-->
+<!--           例如log-level-2013-12-21.log-->
+<!--           其它级别的日志也是如此。-->
+<!--       2、文件路径-->
+<!--           统一输出到/home/logs-->
+<!--       3、Appender-->
+<!--           FILEERROR对应error级别，文件名以{log.context.name}_xxx_error.log形式命名-->
+<!--           FILEWARN对应warn级别，文件名以{log.context.name}_xxx_error.log形式命名-->
+<!--           FILEINFO对应info级别，文件名以{log.context.name}_xxx_error.log形式命名-->
+<!--           FILEDEBUG对应debug级别，文件名以{log.context.name}_xxx_error.log形式命名-->
+<!--           默认输出级别为debug，不明确指定情况下文件名以{log.context.name}.log形式命名-->
+<!--           stdout将日志信息输出到控制上，为方便开发测试使用-->
+<!--    &ndash;&gt;-->
+<!--    &lt;!&ndash;定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径&ndash;&gt;-->
+<!--    <property name="log.directory" value="/home/logs/"/>-->
+<!--    &lt;!&ndash;项目名称，也是存储日志的具体目录&ndash;&gt;-->
+<!--    <property name="log.context.name" value="spring-boot-learning"/>-->
+<!--    &lt;!&ndash;日志的字符编码&ndash;&gt;-->
+<!--    <property name="log.charset" value="UTF-8"/>-->
+<!--    &lt;!&ndash;历史记录最大保存天数&ndash;&gt;-->
+<!--    <property name="log.maxHistory" value="30"/>-->
+<!--    &lt;!&ndash;格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符&ndash;&gt;-->
+<!--    <property name="log.pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS}$$[%thread]$$%-5level{}$$shop-crm-service$$%msg%n"/>-->
+<!--    &lt;!&ndash;日志Error级别名称配置&ndash;&gt;-->
+<!--    <property name="log.error.log.level" value="ERROR"/>-->
+<!--    &lt;!&ndash;异步写日志的队列大小配置，默认为256&ndash;&gt;-->
+<!--    <property name="log.async.queue.size" value="1024"/>-->
+<!--    &lt;!&ndash;配置日志的上下文名称&ndash;&gt;-->
+<!--    <contextName>${log.context.name}</contextName>-->
+
+<!--    &lt;!&ndash;对应spring环境变量为local的日志配置，只做控制台输出配置&ndash;&gt;-->
+<!--    <springProfile name="dev">-->
+<!--        &lt;!&ndash;控制台日志输出配置，可以匹配色彩和高亮&ndash;&gt;-->
+<!--        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">-->
+<!--            <encoder>-->
+<!--                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan(%logger{50}) - -->
+<!--                    %yellow([%file:%line]) - %msg%n-->
+<!--                </pattern>-->
+<!--                &lt;!&ndash;<pattern>${log.pattern}</pattern>&ndash;&gt;-->
+<!--                <charset>${log.charset}</charset>-->
+<!--            </encoder>-->
+<!--        </appender>-->
+<!--    </springProfile>-->
+<!--    <springProfile name="mu,dohko,pre,prod">-->
+<!--        &lt;!&ndash; 服务器上使用的appender start &ndash;&gt;-->
+<!--        &lt;!&ndash; 默认的file appender，按天切分日志 &ndash;&gt;-->
+<!--        <appender name="ROLLING_FILE_DEFAULT" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+<!--            <file>${log.directory}${log.context.name}/${HOSTNAME}.log</file>-->
+<!--            <append>true</append>-->
+<!--            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
+<!--                <fileNamePattern>${log.directory}${log.context.name}/${HOSTNAME}.%d{yyyy-MM-dd}.log</fileNamePattern>-->
+<!--                <maxHistory>${log.maxHistory}</maxHistory>-->
+<!--            </rollingPolicy>-->
+<!--            <encoder>-->
+<!--                <pattern>${log.pattern}</pattern>-->
+<!--                <charset>${log.charset}</charset>-->
+<!--            </encoder>-->
+<!--        </appender>-->
+<!--        &lt;!&ndash; 错误日志，按天切分 &ndash;&gt;-->
+<!--        <appender name="ROLLING_FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+<!--            <filter class="ch.qos.logback.classic.filter.LevelFilter">-->
+<!--                <level>${log.error.log.level}</level>-->
+<!--                <onMatch>ACCEPT</onMatch>-->
+<!--                <onMismatch>DENY</onMismatch>-->
+<!--            </filter>-->
+<!--            <file>${log.directory}${log.context.name}/${HOSTNAME}_error.log</file>-->
+<!--            &lt;!&ndash; 日志追加配置 &ndash;&gt;-->
+<!--            <append>true</append>-->
+<!--            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
+<!--                <fileNamePattern>${log.directory}${log.context.name}/${HOSTNAME}_error.%d{yyyy-MM-dd}.log-->
+<!--                </fileNamePattern>-->
+<!--                <maxHistory>${log.maxHistory}</maxHistory>-->
+<!--            </rollingPolicy>-->
+<!--            &lt;!&ndash; 此日志文件只记录error级别的 &ndash;&gt;-->
+<!--            <encoder>-->
+<!--                <pattern>${log.pattern}</pattern>-->
+<!--                <charset>${log.charset}</charset>-->
+<!--            </encoder>-->
+<!--        </appender>-->
+<!--        &lt;!&ndash; 异步写日志文件的配置 &ndash;&gt;-->
+<!--        <appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">-->
+<!--            &lt;!&ndash; 当队列达到配置队列大小的80%时，不将日志丢失 &ndash;&gt;-->
+<!--            <discardingThreshold>0</discardingThreshold>-->
+<!--            <queueSize>${log.async.queue.size}</queueSize>-->
+<!--            <appender-ref ref="ROLLING_FILE_DEFAULT"/>-->
+<!--        </appender>-->
+<!--    </springProfile>-->
+<!--    &lt;!&ndash; rabbitmq的日志专属配置 &ndash;&gt;-->
+<!--    <logger name="org.springframework.amqp.rabbit.listener.BlockingQueueConsumer" level="WARN"/>-->
+<!--    &lt;!&ndash; zookeeper 的日志专属配置 &ndash;&gt;-->
+<!--    <logger name="org.apache.zookeeper.ClientCnxn" level="WARN"/>-->
+<!--    &lt;!&ndash; 多数据源 的日志专属配置 &ndash;&gt;-->
+<!--    <logger name="com.hualala.commons.multidatasource.curator.CuratorClient" level="WARN"/>-->
+<!--    <logger name="com.hualala.commons.multidatasource.datasource.DynamicDataSource" level="WARN"/>-->
+<!--    &lt;!&ndash; 设置falcon监控的日志输出格式 &ndash;&gt;-->
+<!--    <logger name="com.hualala.infrastructure.falcon.FalconMonitor" level="WARN"/>-->
+<!--    &lt;!&ndash;mybatis的日志专属配置 &ndash;&gt;-->
+<!--    <logger name="jdbc.sqltiming" level="debug"/>-->
+<!--    <logger name="com.ibatis" level="debug"/>-->
+<!--    <logger name="com.ibatis.common.jdbc.SimpleDataSource" level="debug"/>-->
+<!--    <logger name="com.ibatis.common.jdbc.ScriptRunner" level="debug"/>-->
+<!--    <logger name="com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate" level="debug"/>-->
+<!--    <logger name="java.sql.Connection" level="debug"/>-->
+<!--    <logger name="java.sql.Statement" level="debug"/>-->
+<!--    <logger name="java.sql.PreparedStatement" level="debug"/>-->
+<!--    <logger name="java.sql.ResultSet" level="debug"/>-->
+<!--    <logger name="org.springframework" level="WARN"/>-->
+<!--    &lt;!&ndash; 当前项目 的不同环境的日志级别配置 &ndash;&gt;-->
+<!--&lt;!&ndash;    <logger name="com.ms" level="debug" additivity="false">&ndash;&gt;-->
+<!--    <logger name="com.ms" level="debug" additivity="false">-->
+<!--        <springProfile name="dev,test">-->
+<!--            <appender-ref ref="STDOUT"/>-->
+<!--        </springProfile>-->
+<!--        <springProfile name="pre">-->
+<!--            <appender-ref ref="ASYNC_FILE"/>-->
+<!--            <appender-ref ref="ROLLING_FILE_ERROR"/>-->
+<!--        </springProfile>-->
+<!--        <springProfile name="prod">-->
+<!--            <appender-ref ref="ASYNC_FILE"/>-->
+<!--            <appender-ref ref="ROLLING_FILE_ERROR"/>-->
+<!--        </springProfile>-->
+<!--    </logger>-->
+<!--    <root>-->
+<!--        <springProfile name="dev,test">-->
+<!--            <level value="info"/>-->
+<!--            <appender-ref ref="STDOUT"/>-->
+<!--        </springProfile>-->
+<!--        &lt;!&ndash; dohko环境用来测试，日志级别尽量可以设置的低，便于定位问题 &ndash;&gt;-->
+<!--        <springProfile name="mu,dohko,pre">-->
+<!--            <level value="info"/>-->
+<!--            <appender-ref ref="ASYNC_FILE"/>-->
+<!--            <appender-ref ref="ROLLING_FILE_ERROR"/>-->
+<!--        </springProfile>-->
+<!--        &lt;!&ndash; pre环境用来做压测，避免对测试环境的日志服务产生压力，日志级别设置为warn &ndash;&gt;-->
+<!--        <springProfile name="pre">-->
+<!--            <level value="warn"/>-->
+<!--            <appender-ref ref="ASYNC_FILE"/>-->
+<!--            <appender-ref ref="ROLLING_FILE_ERROR"/>-->
+<!--        </springProfile>-->
+<!--        &lt;!&ndash; production为生产环境，需要记录能够定位问题或流程流转的日志，但是非必要的日志无须记录 &ndash;&gt;-->
+<!--        <springProfile name="prod">-->
+<!--            <level value="info"/>-->
+<!--            <appender-ref ref="ASYNC_FILE"/>-->
+<!--            <appender-ref ref="ROLLING_FILE_ERROR"/>-->
+<!--        </springProfile>-->
+<!--    </root>-->
+<!--</configuration>-->
+<!-- -->
